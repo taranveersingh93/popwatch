@@ -8,8 +8,15 @@ const getMovies = async () => {
             }
         });
         const data = await response.json();
+        console.log(data);
         return data;
     } catch (error) {
+        Swal.fire({
+            backdrop: false,
+            title: 'Oops',
+            text: 'Something went wrong reaching the TMDB API.',
+            icon: 'error'
+        })
         console.error(error);
     }
 }
@@ -24,6 +31,12 @@ const getMovie = async (movieID) => {
         const data = await response.json();
         return data;
     } catch (error) {
+        Swal.fire({
+            backdrop: false,
+            title: 'Oops',
+            text: 'Something went wrong reaching the TMDB API.',
+            icon: 'error'
+        })
         console.error(error);
     }
 }
@@ -76,10 +89,10 @@ const formatDate = date => {
     let hourText = "hour";
     let minText = "minute";
     if (hours > 1) {
-        hourText = "hours"
+        hourText = "h"
     }
     if (remainderMins > 1) {
-        minText = "minutes"
+        minText = "m"
     }
     return `${hours} ${hourText} ${remainderMins} ${minText}`;
   }
@@ -159,7 +172,6 @@ const clearModal = () => {
 }
 
 const showMovieDetails = async (clickedButton) => {
-    clearModal();
     const movieID = clickedButton.getAttribute('data-movieId');
     const movieDetails = await getMovie(movieID);
     const modalBody = document.querySelector('#movieModal .modal-body');

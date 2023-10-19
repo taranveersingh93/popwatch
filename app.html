@@ -15,7 +15,7 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css" />
 		<link rel="stylesheet" href="/css/site.css" />
 	</head>
-	<body>
+	<body onload="displayMovies()">
 		<!-- bscf-navbar-base -->
 		<nav class="navbar navbar-expand-lg navbar-dark">
 			<div class="container-fluid">
@@ -63,7 +63,6 @@
 
 		<main class="container-xl py-3">
 			<h1 class="text-center MY-3 display-3">Top Picks</h1>
-			<button class="btn btn-primary mb-4" onclick="displayMovies()">Get Movies</button>
 			<div
 				class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-evenly"
 				id="movieList"
