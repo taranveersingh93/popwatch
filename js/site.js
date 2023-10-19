@@ -51,6 +51,7 @@ const formatDate = date => {
   }
 
   const formatCurrency = number => {
+    console.log('number', number)
     const numString = number.toString();
     let startNum;
     let endNum;
@@ -63,6 +64,8 @@ const formatDate = date => {
     } else if (number > 1000) {
         startNum = numString.slice(0, numString.length - 3)
         endNum = "Thousand";
+    } else {
+        return "Figure unavailable";
     }
     return `$${startNum} ${endNum}`;
   }
@@ -121,7 +124,6 @@ const generateGenres = (genres) => {
         Comedy: "text-bg-warning"
     }
     
-    const classes = ["text-bg-primary", "text-bg-success", "text-bg-danger", "text-bg-warning", "text-bg-info", "text-bg-secondary", "text-bg-light"]
     for (let i = 0; i < genres.length; i++) {
         let className = "text-bg-dark";
         if (genresMap[genres[i].name]) {
