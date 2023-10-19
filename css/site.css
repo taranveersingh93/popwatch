@@ -85,3 +85,30 @@ pre[class*="language-"] {
     --bs-btn-disabled-color: var(--ts-primary-color);
     --bs-btn-disabled-border-color: var(--ts-primary-color);
 }
+
+a {
+    text-decoration: none;
+}
+
+.poster-img {
+    max-width: 100%;
+}
+
+.modal-body {
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.modal-content {
+    --bs-modal-color: var(--ts-secondary-color)
+}
+
+.modal-header, .modal-footer {
+    background-color: var(--ts-primary-color);
+    color: var(--ts-secondary-color);
+}
+
+.important-info {
+    font-weight: 600;
+    text-decoration: underline;
+}
