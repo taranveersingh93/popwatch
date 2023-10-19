@@ -86,6 +86,10 @@ pre[class*="language-"] {
     --bs-btn-disabled-border-color: var(--ts-primary-color);
 }
 
+.btn-close {
+    filter: invert(100%);
+}
+
 a {
     text-decoration: none;
 }
