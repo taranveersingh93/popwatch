@@ -117,6 +117,14 @@ a {
     text-decoration: underline;
 }
 
+.text-clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    overflow: hidden;
+}
+
 @media (min-width: 576px) {
     .app-logo {
         max-width: 400px;
