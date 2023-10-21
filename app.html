@@ -62,7 +62,12 @@
 		</nav>
 
 		<main class="container-xl py-3">
-			<h1 class="text-center MY-3 display-3">Top Picks</h1>
+			<h1 class="text-center mb-4 display-3">Top Picks</h1>
+			<div class="d-flex justify-content-center main-loader-div">
+				<div class="spinner-border text-dark" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
 			<div
 				class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-evenly"
 				id="movieList"
@@ -122,15 +127,26 @@
 			<div class="modal-dialog modal-xl">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="modal"
+							aria-label="Close"
+							onclick="clearModal()"
+						></button>
 					</div>
 					<div class="modal-body">
+						<div class="d-flex justify-content-center loader-div">
+							<div class="spinner-border text-dark mt-5" role="status">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+						</div>
 						<div class="row">
-							<div class="col-12 col-md-4 d-md-flex align-items-md-center">
+							<div class="col-12 col-lg-4 d-md-flex align-items-md-center">
 								<img class="poster-img" src="" />
 							</div>
-							<div class="col-12 col-md-8">
+							<div class="col-12 col-lg-8">
 								<div>
 									<h2 class="movie-title mt-3"></h2>
 									<p class="modal-tagline m-0"></p>

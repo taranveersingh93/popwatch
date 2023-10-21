@@ -8,7 +8,6 @@ const getMovies = async () => {
             }
         });
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (error) {
         Swal.fire({
@@ -64,7 +63,6 @@ const formatDate = date => {
   }
 
   const formatCurrency = number => {
-    console.log('number', number)
     const numString = number.toString();
     let startNum;
     let endNum;
@@ -86,15 +84,9 @@ const formatDate = date => {
   const formatRuntime = totalMins => {
     const hours = Math.floor(totalMins/60);
     const remainderMins = totalMins % 60;
-    let hourText = "hour";
-    let minText = "minute";
-    if (hours > 1) {
-        hourText = "h"
-    }
-    if (remainderMins > 1) {
-        minText = "m"
-    }
-    return `${hours} ${hourText} ${remainderMins} ${minText}`;
+    let hourText = "h";
+    let minText = "m";
+    return `${hours}${hourText} ${remainderMins}${minText}`;
   }
   
 
@@ -103,8 +95,8 @@ const displayMovies = async () => {
     const movieListDiv = document.getElementById('movieList');
     const moviePosterTemplate = document.getElementById('movieCardTemplate');
     const movies = data.results;
-    // console.log('movie response', movies[0])
-
+    removeLoader(movies[0], "main");
+    
     for (let i = 0; i < movies.length; i++) {
         const movie = movies[i];
         const movieCard = moviePosterTemplate.content.cloneNode(true);
@@ -149,31 +141,78 @@ const generateGenres = (genres) => {
 }
 
 const clearModal = () => {
-    const modalBody = document.querySelector('#movieModal .modal-body');
-    const modalTitle = document.querySelector('#movieModal .modal-title');
-    const posterImg = modalBody.querySelector('.poster-img');
-    const modalTagline = modalBody.querySelector('.modal-tagline');
-    // const modalOverview = modalBody.querySelector('.modal-overview');
-    const releaseDate = modalBody.querySelector('.release-date');
-    const budget = modalBody.querySelector('.budget');
-    const revenue = modalBody.querySelector('.revenue');
-    const runtime = modalBody.querySelector('.runtime');
-    const modalGenres = modalBody.querySelector('.genres');
+    const modalBody = document.querySelector('#movieModal .modal-content');
+    const html = `
+    <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            onclick="clearModal()"
+        ></button>
+    </div>
+    <div class="modal-body">
+        <div class="d-flex justify-content-center loader-div">
+            <div class="spinner-border text-dark mt-5" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-4 d-md-flex align-items-md-center">
+                <img class="poster-img" src="" />
+            </div>
+            <div class="col-12 col-lg-8">
+                <div>
+                    <h2 class="movie-title mt-3"></h2>
+                    <p class="modal-tagline m-0"></p>
+                    <div class="genres py-3 border-bottom border-0 border-light border-opacity-25"></div>
+                    <h3 class="synopsis-heading mt-3 mb-0"></h3>
+                    <p class="synopsis-text py-3 border-bottom border-0 border-light border-opacity-25"></p>
+                    <p class="runtime m-1"></p>
+                    <p class="ratings m-1"></p>
+                    <p class="release-date m-1"></p>
+                    <p class="budget m-1"></p>
+                    <p class="revenue m-1"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer d-flex justify-content-evenly justify-content-md-end">
+        <a href="#" type="button" target="_blank" class="btn btn-warning imdb-btn">View IMDB</a>
+        <a href="#" type="button" target="_blank" class="btn btn-success homepage-btn">Movie Homepage</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>`;
+    modalBody.innerHTML = html;
+}
 
-    posterImg.src = "";
-    modalTitle.innerText = "";
-    modalBody.style.backgroundImage = `url("")`;
-    modalTagline.innerText = "";
-    // modalOverview.innerText = "";
-    runtime.innerText = "";
-    releaseDate.innerText = "";
-    budget.innerText = "";
-    revenue.innerText = "";
+const removeLoader = (details, parentElement) => {
+    let className;
+
+    if (parentElement === "main") {
+        className = "main-loader-div"
+    } else {
+        className = "loader-div";
+    }
+
+    if (details?.title) { 
+        const loaderDiv = document.querySelector(`.${className}`);
+        loaderDiv.innerHTML = '';
+    }
+}
+
+const removeMainLoader = (details) => {
+    if (details.title) {
+        const loaderDiv = document.querySelector('.main-loader-div');
+        loaderDiv.innerHTML = '';
+    }
 }
 
 const showMovieDetails = async (clickedButton) => {
     const movieID = clickedButton.getAttribute('data-movieId');
     const movieDetails = await getMovie(movieID);
+    removeLoader(movieDetails, "modal");
     const modalBody = document.querySelector('#movieModal .modal-body');
     const modalTitle = document.querySelector('#movieModal .modal-title');
     const posterImg = modalBody.querySelector('.poster-img');
@@ -194,7 +233,7 @@ const showMovieDetails = async (clickedButton) => {
     modalTitle.innerText = movieDetails.title;
     movieTitle.innerText = movieDetails.title;
     modalBody.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.8),rgba(0, 0, 0, 0.8)), url(https://image.tmdb.org/t/p/w500${movieDetails.backdrop_path})`;
-    modalTagline.innerText = `"${movieDetails.tagline}"`;
+    modalTagline.innerText = movieDetails.tagline? `"${movieDetails.tagline}"`: "";
     const genres = movieDetails.genres;
     const genresHTML = generateGenres(genres);
     modalGenres.innerHTML = genresHTML;
