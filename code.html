@@ -38,7 +38,7 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item">
-							<a class="nav-link active" href="/index.html">Home</a>
+							<a class="nav-link" href="/index.html">Home</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/app.html">The App</a>
@@ -268,7 +268,7 @@ const removeLoader = (details, parentElement) => {
 	let className;
 
 	if (parentElement === "main") {
-		className = "main-loader-div"
+		className = "main-loader-div";
 	} else {
 		className = "loader-div";
 	}
@@ -279,20 +279,13 @@ const removeLoader = (details, parentElement) => {
 	}
 }
 
-const removeLoader = (details) => {
-	if (details.title) {
-		const loaderDiv = document.querySelector('.main-loader-div');
-		loaderDiv.innerHTML = '';
-	}
-}
-
 const showMovieDetails = async (clickedButton) => {
 	clearModal();
 	const movieID = clickedButton.getAttribute('data-movieId');
 	const movieDetails = await getMovie(movieID);
 	removeLoader(movieDetails, "modal"); 
 	if (!movieDetails.title) {
-		displayError()
+		displayError();
 	} else {
 		const modalBody = document.querySelector('#movieModal .modal-body');
 		const modalTitle = document.querySelector('#movieModal .modal-title');
@@ -354,23 +347,100 @@ const showMovieDetails = async (clickedButton) => {
 						</li>
 					</ul>
 					<p class="display-6 text-center">Elephant in the room</p>
-					<p>Yes, I know. the <code>api key</code> on line 1 is a major concern and not the best look.</p>
+					<p>
+						Yes, I know. <strong>The <code>api key</code> on line 1 is a major concern and not the best look.</strong>
+					</p>
 					<p>
 						It would've been better if I stored it as an environment variable, added the <code>.env</code> file to a
-						<code>gitignore</code> file to avoid pushing the env variable to github. But even then, it would've been
+						<code>gitignore</code> file to avoid pushing the env variables to github. But even then, it would've been
 						exposed as a header in the network request.
 					</p>
 					<p>
-						while out of scope for this exercise, <strong> ideal solution would've been a proxy API server.</strong> So
-						instead of directly calling the <code>tmdb</code> api, the app could call the proxy server which would've
-						had the api key and would've relayed requests from clientside (this app) and relayed responses from the tmdb
-						service. That way, the api key would've never been lived in the frontend.
+						While out of scope for this exercise,
+						<strong> the ideal solution would've been a proxy API server.</strong> So instead of directly calling the
+						<code>tmdb</code> api, the app could call the proxy server which would've had the api key and would've
+						relayed requests from clientside (this app) and relayed responses from the tmdb service. That way, the api
+						key would've never been lived in the frontend.
 					</p>
 					<p>
 						Covering all loose ends, the proxy api server should've had a CORS policy only allowing requests from the
 						clientside so that it's not open for bad actors to access.
 					</p>
-					<p class="display-6 text-center"></p>
+					<p class="display-6 text-center">API calling functions</p>
+					<p>
+						The purpose of working on this app was to get exposure with calling an api and using async JS functions.
+					</p>
+					<p>
+						An API call is essentially the clientside of an app using the browser to visit "a server" for getting data
+						or posting data.
+					</p>
+					<p>
+						In this app, the functions that call an API are <code>getMovies()</code> (line 3) and
+						<code>getMovie(movieID)</code> (line 28). The <code>getMovies()</code> function fetches a list of movies
+						with enough data that I could generate movie cards from the data. Whereas, <code>getMovie()</code> function
+						requires a movie ID and gets the details for the particular movie. I used this call to generate the modal
+						when user clicks <code>More Info</code> button.
+					</p>
+					<p class="display-6 text-center">Async Await</p>
+					<p>
+						The <code>await</code> keyword relies on the function being <code>async</code>. What
+						<code>async await</code> allow us to do is to wait until an asynchronous (not instant) expression is
+						resolved. So line 11 <code>return data</code> does not execute until line 10
+						<code>const data = await response.json()</code> is resolved.
+					</p>
+					<p class="display-6 text-center">Error Handling</p>
+					<p>
+						The api functions use <code>try/catch</code> codeblocks. In operations that require api calls and rely on
+						the response, there's significant room for an exception to be thrown in the <code>try</code> block. If any
+						such exception is thrown in the <code>try</code> block, the fail-safe <code>catch</code> block is executed.
+						This is used to do effective error handling.
+					</p>
+					<p>
+						Additionally, even within the code flow of <code>try</code> blocks, there's conditional checking of the
+						expected response for happy path. If the desired response is not received, an error will be displayed.
+					</p>
+					<p class="display-6 text-center">What happens on pageload</p>
+					<p>
+						Upon pageload, the code triggers the async function <code>displayMovies()</code> (line 93). This function is
+						a DOM manipulating function. Since our movies are not hardcoded in the HTML code, this function dynamically
+						creates the movie cards by going through an array of movie objects.
+					</p>
+					<p>
+						For the purpose stated above, I call <code>getMovies()</code> and store the returned value to
+						<code>data</code> variable.
+					</p>
+					<p>
+						I then check whether <code>data</code> is a truthy value and whether it has a property named
+						<code>results</code> (line 98). If it does, I am sure to have received a desirable response from the API
+						endpoint and I can continue the code-flow of removing the loader and looping through the data and displaying
+						movie cards on the DOM.
+					</p>
+					<p>If the condition on line 98 is false, I display an error.</p>
+					<p class="display-6 text-center">How I show movie details</p>
+					<p>
+						The button <code>More Info</code> on each movie card is made as a clone of a <code>template</code> tag. I
+						added an event listener to this template tag which passes in the argument of <code>event.target</code>. This
+						allows each button to have an event listener without repetitive code.
+					</p>
+					<p>
+						This <code>event.target</code> allowed me to access the movie ID in the function
+						<code>showMovieDetails</code> (line 211). Because this ID is required in getting the movie details, I call
+						the function <code>getMovie</code> with this ID as an argument.
+					</p>
+					<p>
+						Moreover, a user could open the modal for different movies multiple times and unsurprisingly, an api
+						response could take some time. So I took the decision to first clear out the modal everytime it's clicked
+						(line 212). This ensured that the user won't see the previously clicked movie for as long as the latest
+						clicked movie's request is not successful. This bug would be especially evident if the internet was slow.
+						With a cleared modal, a user would only see the spinning loader in an otherwise empty modal.
+					</p>
+					<p>Once the details request gets a response, the loader is removed.</p>
+					<p>
+						I finally check if the response has one of the desired properties I'm looking for. If the response is bad, I
+						display an error. If the response is good, I grab all the necessary DOM elements and plug the data in those.
+						I use many helper functions like <code>formatDate, formatCurrency, formatRuntime, generateGenres</code> to
+						make the data user friendly.
+					</p>
 				</div>
 			</div>
 		</main>
