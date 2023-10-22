@@ -9,15 +9,21 @@ const getMovies = async () => {
         });
         const data = await response.json();
         return data;
+
     } catch (error) {
-        Swal.fire({
-            backdrop: false,
-            title: 'Oops',
-            text: 'Something went wrong reaching the TMDB API.',
-            icon: 'error'
-        })
+        displayError();
         console.error(error);
     }
+}
+
+const displayError = () => {
+    Swal.fire({
+        backdrop: false,
+        title: 'Oh No!',
+        text: `There was some trouble connecting with TMDB.`,
+        icon: 'error',
+        confirmButtonColor: '#3f4d5a'
+    })
 }
 
 const getMovie = async (movieID) => {
@@ -30,12 +36,7 @@ const getMovie = async (movieID) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        Swal.fire({
-            backdrop: false,
-            title: 'Oops',
-            text: 'Something went wrong reaching the TMDB API.',
-            icon: 'error'
-        })
+        displayError();
         console.error(error);
     }
 }
@@ -94,22 +95,28 @@ const displayMovies = async () => {
     const data = await getMovies();
     const movieListDiv = document.getElementById('movieList');
     const moviePosterTemplate = document.getElementById('movieCardTemplate');
-    const movies = data.results;
-    removeLoader(movies[0], "main");
-    
-    for (let i = 0; i < movies.length; i++) {
-        const movie = movies[i];
-        const movieCard = moviePosterTemplate.content.cloneNode(true);
-        const movieImg = movieCard.querySelector('.card-img-top');
-        movieImg.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-        const movieTitle = movieCard.querySelector('.card-body > h5');
-        movieTitle.innerText = movie.title;
-        const movieParagraphElement = movieCard.querySelector('.card-text');
-        movieParagraphElement.innerText = movie.overview;
-        const movieBtn = movieCard.querySelector('.btn-primary');
-        movieBtn.setAttribute("data-movieId", movie.id);
-        movieListDiv.appendChild(movieCard);
+
+    if (data?.results) {
+        const movies = data.results;
+        removeLoader(movies[0], "main");
+        
+        for (let i = 0; i < movies.length; i++) {
+            const movie = movies[i];
+            const movieCard = moviePosterTemplate.content.cloneNode(true);
+            const movieImg = movieCard.querySelector('.card-img-top');
+            movieImg.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+            const movieTitle = movieCard.querySelector('.card-body > h5');
+            movieTitle.innerText = movie.title;
+            const movieParagraphElement = movieCard.querySelector('.card-text');
+            movieParagraphElement.innerText = movie.overview;
+            const movieBtn = movieCard.querySelector('.btn-primary');
+            movieBtn.setAttribute("data-movieId", movie.id);
+            movieListDiv.appendChild(movieCard);
+        }
+    } else {
+        displayError();
     }
+    
 }
 
 const generateGenres = (genres) => {
@@ -210,40 +217,45 @@ const removeMainLoader = (details) => {
 }
 
 const showMovieDetails = async (clickedButton) => {
+    clearModal();
     const movieID = clickedButton.getAttribute('data-movieId');
     const movieDetails = await getMovie(movieID);
-    removeLoader(movieDetails, "modal");
-    const modalBody = document.querySelector('#movieModal .modal-body');
-    const modalTitle = document.querySelector('#movieModal .modal-title');
-    const posterImg = modalBody.querySelector('.poster-img');
-    const modalTagline = modalBody.querySelector('.modal-tagline');
-    const releaseDate = modalBody.querySelector('.release-date');
-    const budget = modalBody.querySelector('.budget');
-    const revenue = modalBody.querySelector('.revenue');
-    const runtime = modalBody.querySelector('.runtime');
-    const ratings = modalBody.querySelector('.ratings');
-    const modalGenres = modalBody.querySelector('.genres');
-    const movieTitle = modalBody.querySelector('.movie-title');
-    const synopsisHeading = modalBody.querySelector('.synopsis-heading');
-    const synopsisText = modalBody.querySelector('.synopsis-text');
-    const modalFooter = document.querySelector('.modal-footer');
-    const imdbBtn = modalFooter.querySelector('.imdb-btn');
-    const homepageBtn = modalFooter.querySelector('.homepage-btn')
-    posterImg.src = `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`
-    modalTitle.innerText = movieDetails.title;
-    movieTitle.innerText = movieDetails.title;
-    modalBody.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.8),rgba(0, 0, 0, 0.8)), url(https://image.tmdb.org/t/p/w500${movieDetails.backdrop_path})`;
-    modalTagline.innerText = movieDetails.tagline? `"${movieDetails.tagline}"`: "";
-    const genres = movieDetails.genres;
-    const genresHTML = generateGenres(genres);
-    modalGenres.innerHTML = genresHTML;
-    synopsisHeading.innerText = "Synopsis";
-    synopsisText.innerText = movieDetails.overview;
-    runtime.innerHTML = `<span class = "important-info">Runtime:</span> ${formatRuntime(movieDetails.runtime)} <i class="bi bi-clock"></i>`;
-    releaseDate.innerHTML = `<span class = "important-info">Release Date:</span> ${formatDate(movieDetails.release_date)} <i class="bi bi-calendar-date"></i>`;
-    budget.innerHTML = `<span class = "important-info">Budget:</span> ${formatCurrency(movieDetails.budget)} <i class="bi bi-coin"></i>`;
-    revenue.innerHTML = `<span class = "important-info">Revenue:</span> ${formatCurrency(movieDetails.revenue)} <i class="bi bi-coin"></i>`;
-    ratings.innerHTML = `<span class = "important-info">Ratings:</span> ${movieDetails.vote_average.toFixed(1)} <i class="bi bi-star-fill"></i>`;
-    imdbBtn.setAttribute("href", `https://www.imdb.com/title/${movieDetails.imdb_id}/`);
-    homepageBtn.setAttribute("href", movieDetails.homepage);
+    removeLoader(movieDetails, "modal"); 
+    if (!movieDetails.title) {
+        displayError()
+    } else {
+        const modalBody = document.querySelector('#movieModal .modal-body');
+        const modalTitle = document.querySelector('#movieModal .modal-title');
+        const posterImg = modalBody.querySelector('.poster-img');
+        const modalTagline = modalBody.querySelector('.modal-tagline');
+        const releaseDate = modalBody.querySelector('.release-date');
+        const budget = modalBody.querySelector('.budget');
+        const revenue = modalBody.querySelector('.revenue');
+        const runtime = modalBody.querySelector('.runtime');
+        const ratings = modalBody.querySelector('.ratings');
+        const modalGenres = modalBody.querySelector('.genres');
+        const movieTitle = modalBody.querySelector('.movie-title');
+        const synopsisHeading = modalBody.querySelector('.synopsis-heading');
+        const synopsisText = modalBody.querySelector('.synopsis-text');
+        const modalFooter = document.querySelector('.modal-footer');
+        const imdbBtn = modalFooter.querySelector('.imdb-btn');
+        const homepageBtn = modalFooter.querySelector('.homepage-btn')
+        posterImg.src = `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`
+        modalTitle.innerText = movieDetails.title;
+        movieTitle.innerText = movieDetails.title;
+        modalBody.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.8),rgba(0, 0, 0, 0.8)), url(https://image.tmdb.org/t/p/w500${movieDetails.backdrop_path})`;
+        modalTagline.innerText = movieDetails.tagline? `"${movieDetails.tagline}"`: "";
+        const genres = movieDetails.genres;
+        const genresHTML = generateGenres(genres);
+        modalGenres.innerHTML = genresHTML;
+        synopsisHeading.innerText = "Synopsis";
+        synopsisText.innerText = movieDetails.overview;
+        runtime.innerHTML = `<span class = "important-info">Runtime:</span> ${formatRuntime(movieDetails.runtime)} <i class="bi bi-clock"></i>`;
+        releaseDate.innerHTML = `<span class = "important-info">Release Date:</span> ${formatDate(movieDetails.release_date)} <i class="bi bi-calendar-date"></i>`;
+        budget.innerHTML = `<span class = "important-info">Budget:</span> ${formatCurrency(movieDetails.budget)} <i class="bi bi-coin"></i>`;
+        revenue.innerHTML = `<span class = "important-info">Revenue:</span> ${formatCurrency(movieDetails.revenue)} <i class="bi bi-coin"></i>`;
+        ratings.innerHTML = `<span class = "important-info">Ratings:</span> ${movieDetails.vote_average.toFixed(1)} <i class="bi bi-star-fill"></i>`;
+        imdbBtn.setAttribute("href", `https://www.imdb.com/title/${movieDetails.imdb_id}/`);
+        homepageBtn.setAttribute("href", movieDetails.homepage);
+    }
 }
